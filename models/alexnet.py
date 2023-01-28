@@ -51,34 +51,44 @@ class linear(nn.Module):
 class alexnet(nn.Module):
     def __init__(self):
         super(alexnet, self).__init__()
-    
+        
+        self.stage1 = nn.Sequential(
+            conv(3, 96, 11, 4, 2),
+            lrn(5),
+            pooling(3, 2)
+        )
+        
+        self.stage2 = nn.Sequential(
+            conv(96, 256, 5, 1, 2),
+            lrn(5),
+            pooling(3, 2),
+        )
+        
+        self.stage3 = conv(256, 384, 3, 1, 1)
+        
+        self.stage4 = conv(384, 384, 3, 1, 1)
+        
+        self.stage5 = nn.Sequential(
+            conv(384, 256, 3, 1, 1),
+            pooling(3, 3)
+        )
+        
+        self.stage6 = nn.Sequential(
+            linear(4096, 4096),
+            linear(4096, 10),
+            nn.Softmax(0)
+        )
+        
     def forward(self, x):
-        # first stage
-        x = conv(3, 96, 11, 4, 2)(x)
-        x = lrn(5)(x)
-        x = pooling(3, 2)(x)
-        
-        # second stage
-        x = conv(96, 256, 5, 1, 2)(x)
-        x = lrn(5)(x)
-        x = pooling(3, 2)(x)
-        
-        # third stage
-        x = conv(256, 384, 3, 1, 1)(x)
-        
-        # fourth stage
-        x = conv(384, 384, 3, 1, 1)(x)
-        
-        # fifth stage
-        x = conv(384, 256, 3, 1, 1)(x)
-        x = pooling(3, 3)(x)
-        
-        # six stage
-        x = x.view(-1)
-        x = linear(4096, 4096)(x)
-        x = linear(4096, 1000)(x)
-        x = nn.Softmax(0)(x)
+        x = self.stage1(x)
+        x = self.stage2(x)
+        x = self.stage3(x)
+        x = self.stage4(x)
+        x = self.stage5(x)
+        x = torch.flatten(x, 1)
+        x = self.stage6(x)
         return x
+    
         
         
 if __name__=='__main__':
@@ -86,6 +96,6 @@ if __name__=='__main__':
     model = alexnet()
     
     with torch.no_grad():
-        x = torch.rand((1,3,224,224))
+        x = torch.rand((3,3,224,224))
         y = model(x)
         print(y.shape)
