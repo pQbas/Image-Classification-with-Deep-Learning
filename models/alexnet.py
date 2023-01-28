@@ -76,7 +76,7 @@ class alexnet(nn.Module):
         self.stage6 = nn.Sequential(
             linear(4096, 4096),
             linear(4096, 10),
-            nn.Softmax()
+            nn.Softmax(dim=1)
         )
         
         # intializing weights
