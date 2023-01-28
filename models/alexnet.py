@@ -53,7 +53,7 @@ class alexnet(nn.Module):
         super(alexnet, self).__init__()
         
         self.stage1 = nn.Sequential(
-            conv(3, 96, 11, 4, 2),
+            conv(1, 96, 11, 4, 2),
             lrn(5),
             pooling(3, 2)
         )
