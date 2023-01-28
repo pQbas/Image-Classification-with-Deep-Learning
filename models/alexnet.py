@@ -74,8 +74,8 @@ class alexnet(nn.Module):
         )
         
         self.stage6 = nn.Sequential(
-            linear(4096, 4096),
-            linear(4096, 10),
+            linear(1024, 1024),
+            linear(1024, 10),
             nn.Softmax(dim=1)
         )
         
@@ -114,7 +114,6 @@ if __name__=='__main__':
     model = alexnet()
     
     with torch.no_grad():
-        x = torch.rand((3,3,224,224))
+        x = torch.rand((32,1,128,128))
         y = model(x)
         print(y.shape)
-        print(y)
