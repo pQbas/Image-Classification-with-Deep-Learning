@@ -76,8 +76,11 @@ class alexnet(nn.Module):
         self.stage6 = nn.Sequential(
             linear(4096, 4096),
             linear(4096, 10),
-            nn.Softmax(0)
+            nn.Softmax()
         )
+        
+        # intializing weights
+        self.initialize_weights()
         
     def forward(self, x):
         x = self.stage1(x)
@@ -89,6 +92,21 @@ class alexnet(nn.Module):
         x = self.stage6(x)
         return x
     
+    def initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, torch.nn.Conv2d):
+                torch.nn.init.kaiming_uniform_(m.weight)
+                
+                if m.bias is not None:
+                    torch.nn.init.constant_(m.bias, 0)
+                        
+            elif isinstance(m, torch.nn.BatchNorm2d):
+                torch.nn.init.constant_(m.weight, 1)
+                torch.nn.init.constant_(m.bias, 1)
+                    
+            elif isinstance(m, torch.nn.Linear):
+                torch.nn.init.kaiming_uniform_(m.weight)
+                torch.nn.init.constant_(m.bias, 0)
         
         
 if __name__=='__main__':
@@ -99,3 +117,4 @@ if __name__=='__main__':
         x = torch.rand((3,3,224,224))
         y = model(x)
         print(y.shape)
+        print(y)
